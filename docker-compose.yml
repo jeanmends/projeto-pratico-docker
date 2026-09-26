@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Serviço 1: Aplicação Web (Python)
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=minhabase
+      - REDIS_HOST=cache
+    depends_on:
+      - db
+      - cache
+
+  # Serviço 2: Banco de Dados (MySQL)
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: minhabase
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Serviço 3: Cache (Redis)
+  cache:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+# Volume persistente para não perder os dados do MySQL ao parar os contêineres
+volumes:
+  mysql_data:
